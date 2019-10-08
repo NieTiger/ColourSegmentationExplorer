@@ -2,12 +2,12 @@
 
 ### Setup the project
 
-#### Create a virtual environment for OpenCV4 (Optional but recommended)
+ Create a virtual environment for OpenCV4 (Optional but recommended)
 
     virtualenv cv4 
     source cv4/bin/activate
 
-#### Install the dependencies
+ Install the dependencies
 
     pip install -r requirements.txt
 
