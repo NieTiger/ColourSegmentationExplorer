@@ -69,44 +69,42 @@ if __name__ == "__main__":
             gray = cv2.bilateralFilter(gray, 11, 17, 17)
             res1 = cv2.Canny(gray, cannyLowerThresh, 200)
         else:
-            pass
+            # Detect Object
+            hsv_mask, res1 = hsv_masking(
+                frame, lowerThresh, upperThresh)
 
-        # Detect Object
-        hsv_mask, res1 = hsv_masking(
-            frame, lowerThresh, upperThresh)
+            # Track Object
+            track_position = hsv_detection(hsv_mask)
 
-        # Track Object
-        track_position = hsv_detection(hsv_mask)
-
-        # Calculate node and draw finger
-        for centroid in track_position:
-            # Draw and label each finger
-            cv2.circle(frame, tuple(centroid), 6, (255, 255, 255), -1)
-            cv2.putText(frame, "(%d, %d)" % (*centroid,),
-                        (abs(centroid[0] - 25), abs(centroid[1] - 25)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            # Calculate node and draw finger
+            for centroid in track_position:
+                # Draw and label each finger
+                cv2.circle(frame, tuple(centroid), 6, (255, 255, 255), -1)
+                cv2.putText(frame, "(%d, %d)" % (*centroid,),
+                            (abs(centroid[0] - 25), abs(centroid[1] - 25)),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
         cv2.putText(res1, 'Press G to toggle greyscale canny', (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-        # pylint: disable = protected-access
+        cv2.putText(res1, 'Drag the slide bars to explore the HSV colour space', (10, height - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         cv2.putText(frame,
                     datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p")+" Frame %d" %
                     fps._numFrames, (10, frame.shape[0] - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
-        cv2.imshow('Original', frame)
+        # Update the frames
+        cv2.imshow('Live Feed', frame)
         cv2.imshow('Explorer', res1)
 
         # Keyboard OP
         k = cv2.waitKey(5) & 0xFF
-        if k == 27:               # Esc
+        if k == 27:  # Esc
             break
-        elif k == ord('g'):       # toggle gray
+        elif k == ord('g'):  # toggle gray
             GRAY = not GRAY
 
-
         fps.update()
-
 
     # Stops video stream, calculates FPS and does some clean ups
     fps.stop()
