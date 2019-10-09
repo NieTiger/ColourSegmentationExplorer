@@ -1,9 +1,8 @@
 """
-This module contains the helper functions for OpenCV based finger tracking
-for use in human truth file generation
+Helper functions for colour tracking
 
 hsv_masking(frame, lower_thresh, upper_thresh) - masks an image with HSV thresholds
-find_screen_cnts(frame)
+hsv_detection(hsv_mask) - calculate centroids of large contours in the frame
 
 Class _Tracker() provides an example implementation of the tracker functions
 """
@@ -16,18 +15,8 @@ from scipy.spatial import distance
 
 def hsv_masking(frame, lower_thresh_hsv, upper_thresh_hsv, lower_threshold_binary=60):
     """
-    Applies a HSV mask to isolate magenta colour
+    Applies a HSV mask to isolate a colour
     hsv_masking(frame, lower_thresh, upper_thresh) -> masked
-
-    Parameters:
-    ----------
-    frame : 3D np.array of the image
-    lower_tresh_hsv: lower threshold in HSV color space
-    upper_tresh_hsv: upper threshold in HSV color space
-
-    Output:
-    ------
-    thresholded image
     """
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, lower_thresh_hsv, upper_thresh_hsv)
@@ -43,10 +32,6 @@ def hsv_masking(frame, lower_thresh_hsv, upper_thresh_hsv, lower_threshold_binar
 def hsv_detection(hsv_mask):
     """
     Detector that outputs position of contours in the HSV mask
-
-    Parameters:
-    -----------
-    hsv_mask :
     """
     contours, _ = cv2.findContours(
         hsv_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
