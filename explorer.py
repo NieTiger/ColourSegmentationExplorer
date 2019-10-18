@@ -31,7 +31,6 @@ if __name__ == "__main__":
     fps = FPS().start()
 
     print("[INFO] Camera warming up . . .")
-    cap = cv2.VideoCapture(0)
     time.sleep(2)
 
     cv2.namedWindow('Explorer')
