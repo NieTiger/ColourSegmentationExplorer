@@ -4,7 +4,7 @@ Helper functions for colour tracking
 hsv_masking(frame, lower_thresh, upper_thresh) - masks an image with HSV thresholds
 hsv_detection(hsv_mask) - calculate centroids of large contours in the frame
 
-Class _Tracker() provides an example implementation of the tracker functions
+Class Tracker() provides an example implementation of the tracker functions
 """
 # pylint: disable = invalid-name
 from collections import OrderedDict
@@ -24,8 +24,7 @@ def hsv_masking(frame, lower_thresh_hsv, upper_thresh_hsv, lower_threshold_binar
     ret = cv2.bitwise_and(frame, frame, mask=mask)
 
     gray = cv2.cvtColor(ret, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(
-        gray, lower_threshold_binary, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(gray, lower_threshold_binary, 255, cv2.THRESH_BINARY)
     return thresh, ret
 
 
@@ -33,13 +32,12 @@ def hsv_detection(hsv_mask):
     """
     Detector that outputs position of contours in the HSV mask
     """
-    contours, _ = cv2.findContours(
-        hsv_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(hsv_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     good_pts = []
     if contours:
         contour_areas = np.array([cv2.contourArea(c) for c in contours])
         max_area = max(contour_areas)
-        min_area = max_area/3
+        min_area = max_area / 3
 
         for i, cnt in enumerate(contours):
             if contour_areas[i] > min_area:
@@ -53,16 +51,17 @@ def hsv_detection(hsv_mask):
     return good_pts
 
 
-def show(frame): 
+def show(frame):
     """Helper function for debugging frames"""
     cv2.imshow("frame", frame)
     cv2.waitKey()
 
 
-class _Tracker():
+class Tracker:
     """
     Simple object tracker with centroid euclidian distance
     """
+
     def __init__(self):
         self.nextObjectID = 0
         self.objects = OrderedDict()
@@ -92,7 +91,7 @@ class _Tracker():
             return self.objects
 
         # Initialise centroid array
-        inputCentroids = np.array(positions, dtype='int')
+        inputCentroids = np.array(positions, dtype="int")
 
         # If we are currently not tracking objects, register each new object
         if not self.objects:
@@ -104,7 +103,9 @@ class _Tracker():
             objectCentroids = list(self.objects.values())
 
             # Compute the Euclidian distance between each pair
-            D = distance.cdist(np.array(objectCentroids), inputCentroids, metric='euclidean')
+            D = distance.cdist(
+                np.array(objectCentroids), inputCentroids, metric="euclidean"
+            )
 
             # Find the smallest value in each row and sort the row indices based on their minimum values
             rows = D.min(axis=1).argsort()
@@ -138,4 +139,3 @@ class _Tracker():
                     for ucol in unusedCols:
                         self.register(inputCentroids[ucol])
         return self.objects
-
